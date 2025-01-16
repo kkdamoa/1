@@ -1,0 +1,44 @@
+name: Band Post - qqqq07102624
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Chrome profile
+      run: |
+        mkdir -p ~/.config/chrome_profile
+        cp -r chrome_profile/* ~/.config/chrome_profile/
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+        
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+        
+    - name: Create config file
+      env:
+        EMAIL: ${{ secrets.qqqq07102624_EMAIL }}
+        PASSWORD: ${{ secrets.qqqq07102624_PASSWORD }}
+        TIME: ${{ secrets.qqqq07102624_TIME }}
+        INTERVAL: ${{ secrets.qqqq07102624_INTERVAL }}
+        URL: ${{ secrets.qqqq07102624_URL }}
+        TITLE: ${{ secrets.qqqq07102624_TITLE }}
+      run: |
+        echo '{"email":"$EMAIL","password":"$PASSWORD","post_time":"$TIME","interval_hours":$INTERVAL,"post_url":"$URL","title":"$TITLE","bands":[]}' > config.json
+        
+    - name: Run poster with cookies
+      run: python run_band_poster.py
